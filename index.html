@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Erbil SchoolTracks | بەڕێوەبردنی گواستنەوەی قوتابیان</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="Erbil SchoolTracks">
+        <span class="brand-mark">ES</span>
+        <span><strong>Erbil SchoolTracks</strong><small>سیستەمی گواستنەوەی قوتابیان</small></span>
+      </a>
+      <div class="sidebar-label">سەرەکی</div>
+      <nav class="nav">
+        <button class="nav-link active" data-view="dashboard"><span>▦</span> داشبۆرد</button>
+        <button class="nav-link" data-view="students"><span>♙</span> قوتابیان</button>
+        <button class="nav-link" data-view="drivers"><span>♧</span> شۆفێران</button>
+        <button class="nav-link" data-view="vehicles"><span>▰</span> پاس و تەکسی</button>
+        <button class="nav-link" data-view="map"><span>⌖</span> نەخشە و شوێن</button>
+      </nav>
+      <div class="sidebar-note">
+        <div class="note-icon">i</div>
+        <div><strong>تێبینی گرنگ</strong><p>شوێنی قوتابیان زانیارییەکی هەستیارە. دەستگەیشتن بە تەنها کەسانی مۆڵەتپێدراو بسپێرە.</p></div>
+      </div>
+      <div class="sidebar-bottom"><span class="status-dot"></span> سیستەم بۆ تاقیکردنەوە ئامادەیە</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="menuToggle" aria-label="کردنەوەی لیستی سەرەکی">☰</button>
+        <div class="breadcrumb"><span>Erbil SchoolTracks</span><b>/</b><strong id="pageTitle">داشبۆرد</strong></div>
+        <div class="top-actions">
+          <span class="connection-pill" id="connectionState"><i></i> داتای نموونەیی</span>
+          <div class="avatar">ب</div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-dashboard">
+        <div class="page-heading">
+          <div><p class="eyebrow">بەڕێوەبردنی ڕۆژانە</p><h1>بەخێربێیت 👋</h1><p class="muted">پوختەی گواستنەوەی قوتابیان لە هەولێر</p></div>
+          <button class="btn btn-primary" id="quickAddStudent">＋ زیادکردنی قوتابی</button>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>کۆی قوتابیان</span><span class="stat-icon blue">♙</span></div><strong id="statStudents">0</strong><small class="muted">قوتابی تۆمارکراو</small></article>
+          <article class="stat-card"><div class="stat-top"><span>شۆفێران</span><span class="stat-icon purple">♧</span></div><strong id="statDrivers">0</strong><small class="muted">شۆفێری تۆمارکراو</small></article>
+          <article class="stat-card"><div class="stat-top"><span>ئۆتۆمبێلەکان</span><span class="stat-icon orange">▰</span></div><strong id="statVehicles">0</strong><small class="muted">پاس و تەکسی</small></article>
+          <article class="stat-card"><div class="stat-top"><span>شوێنی دیاریکراو</span><span class="stat-icon green">⌖</span></div><strong id="statLocations">0</strong><small class="muted">شوێنی قوتابیان</small></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel map-panel">
+            <div class="panel-heading"><div><h2>نەخشەی هەولێر</h2><p class="muted">شوێنە پاشەکەوتکراوەکان</p></div><button class="btn btn-light btn-sm" data-goto="map">بینینی نەخشە ←</button></div>
+            <div id="dashboardMap" class="map-box"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><h2>دوایین قوتابیان</h2><p class="muted">قوتابیانی تۆمارکراو لەم سیستەمەدا</p></div><button class="text-button" data-goto="students">هەموویان</button></div>
+            <div id="recentStudents" class="recent-list"></div>
+          </article>
+        </div>
+        <article class="panel setup-banner">
+          <div class="setup-symbol">✓</div><div><h3>بەخێرایی دەست پێ بکە</h3><p>ئەم وێبسایتە دەتوانێت بە داتای نموونەیی کار بکات. بۆ پاشەکەوتکردنی ئۆنلاین، Supabase ڕێک بخە و SQL ـی ناو <code>supabase/schema.sql</code> جێبەجێ بکە.</p></div><button class="btn btn-outline" data-goto="students">دەستپێکردن</button>
+        </article>
+      </section>
+
+      <section class="view" id="view-students">
+        <div class="page-heading"><div><p class="eyebrow">تۆمار و زانیاری</p><h1>قوتابیان</h1><p class="muted">زانیاریی قوتابیان و ناونیشانی وەرگرتن بەڕێوەببە.</p></div><button class="btn btn-primary" id="addStudentBtn">＋ قوتابیی نوێ</button></div>
+        <div class="panel">
+          <div class="toolbar"><label class="search-box"><span>⌕</span><input id="studentSearch" placeholder="گەڕان بە ناوی قوتابی، قوتابخانە..."></label><span class="muted" id="studentCount">0 قوتابی</span></div>
+          <div class="table-wrap"><table><thead><tr><th>قوتابی</th><th>قوتابخانە</th><th>پەیوەندی دایک/باوک</th><th>شوێن</th><th>کردار</th></tr></thead><tbody id="studentsTable"></tbody></table></div>
+          <div class="empty-state hidden" id="studentsEmpty">هیچ قوتابییەک نەدۆزرایەوە. قوتابییەکی نوێ زیاد بکە.</div>
+        </div>
+      </section>
+
+      <section class="view" id="view-drivers">
+        <div class="page-heading"><div><p class="eyebrow">تیمی گواستنەوە</p><h1>شۆفێران</h1><p class="muted">زانیاریی پەیوەندی و جۆری ئۆتۆمبێلی شۆفێران.</p></div><button class="btn btn-primary" id="addDriverBtn">＋ شۆفێری نوێ</button></div>
+        <div class="panel"><div class="toolbar"><label class="search-box"><span>⌕</span><input id="driverSearch" placeholder="گەڕان بە ناوی شۆفێر..."></label><span class="muted" id="driverCount">0 شۆفێر</span></div><div class="table-wrap"><table><thead><tr><th>شۆفێر</th><th>ژمارەی مۆبایل</th><th>جۆری ئۆتۆمبێل</th><th>تێبینی</th><th>کردار</th></tr></thead><tbody id="driversTable"></tbody></table></div><div class="empty-state hidden" id="driversEmpty">هێشتا شۆفێرێک تۆمار نەکراوە.</div></div>
+      </section>
+
+      <section class="view" id="view-vehicles">
+        <div class="page-heading"><div><p class="eyebrow">ئۆتۆمبێلەکان</p><h1>پاس و تەکسی</h1><p class="muted">ژمارەی تۆمار، جۆر و توانای وەرگرتنی قوتابیان.</p></div><button class="btn btn-primary" id="addVehicleBtn">＋ ئۆتۆمبێلی نوێ</button></div>
+        <div class="panel"><div class="toolbar"><label class="search-box"><span>⌕</span><input id="vehicleSearch" placeholder="گەڕان بە ژمارە یان جۆر..."></label><span class="muted" id="vehicleCount">0 ئۆتۆمبێل</span></div><div class="table-wrap"><table><thead><tr><th>ژمارە/ناسنامە</th><th>جۆر</th><th>شوێنی دانیشتن</th><th>شۆفێر</th><th>کردار</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div><div class="empty-state hidden" id="vehiclesEmpty">هێشتا ئۆتۆمبێلێک تۆمار نەکراوە.</div></div>
+      </section>
+
+      <section class="view" id="view-map">
+        <div class="page-heading"><div><p class="eyebrow">شوێن و ناونیشان</p><h1>نەخشەی هەولێر</h1><p class="muted">لەسەر نەخشە کلیک بکە بۆ دیاریکردنی شوێنی قوتابی، پاشان لە فۆڕمەکەدا پاشەکەوتی بکە.</p></div><button class="btn btn-outline" id="locateMe">⌖ شوێنی ئێستام</button></div>
+        <div class="map-layout"><div class="panel map-main-panel"><div id="mainMap" class="large-map"></div><div class="map-legend"><span><i class="legend-dot blue-dot"></i> قوتابیان</span><span><i class="legend-dot green-dot"></i> شوێنی هەڵبژێردراو</span></div></div><aside class="panel map-side"><h2>شوێنی هەڵبژێردراو</h2><p class="muted">لەسەر نەخشە کلیک بکە، یان ژمارەکان بنووسە.</p><form id="locationForm"><label>ناوی قوتابی<select id="locationStudent" required><option value="">قوتابی هەڵبژێرە</option></select></label><label>Latitude<input id="latitude" type="number" step="any" placeholder="36.1911" required></label><label>Longitude<input id="longitude" type="number" step="any" placeholder="44.0092" required></label><label>ناونیشان<input id="address" maxlength="250" placeholder="ناوی گەڕەک یان نزیکترین شوێن"></label><button class="btn btn-primary full-width" type="submit">پاشەکەوتکردنی شوێن</button></form><div class="hint-box">تێبینی: ئەم بەشە شوێنی قوتابی پاشەکەوت دەکات؛ شوێنی زیندووی پاس لە ئێستادا چالاک نییە.</div></aside></div>
+      </section>
+
+      <footer class="footer"><span>© <span id="year"></span> Erbil SchoolTracks</span><span>دروستکراو بۆ بەڕێوەبردنی گواستنەوەی قوتابیان</span></footer>
+    </main>
+  </div>
+
+  <dialog id="studentDialog" class="modal"><form id="studentForm" class="modal-form"><div class="modal-heading"><div><p class="eyebrow">تۆمار</p><h2>زیادکردنی قوتابی</h2></div><button type="button" class="icon-button" data-close="studentDialog" aria-label="داخستن">×</button></div><input type="hidden" id="studentId"><label>ناوی تەواوی قوتابی *<input id="studentName" required maxlength="120" placeholder="ناوی قوتابی"></label><label>ناوی قوتابخانە *<input id="schoolName" required maxlength="160" placeholder="ناوی قوتابخانە"></label><div class="form-row"><label>ژمارەی مۆبایلی دایک/باوک<input id="parentPhone" type="tel" maxlength="30" placeholder="07xx xxx xxxx"></label><label>پۆل<input id="studentGrade" maxlength="40" placeholder="پۆلی ٥"></label></div><label>ناونیشان<textarea id="studentAddress" rows="2" maxlength="250" placeholder="گەڕەک، کۆڵان، نزیکترین شوێن"></textarea></label><div class="form-row"><label>Latitude<input id="studentLat" type="number" step="any" placeholder="36.1911"></label><label>Longitude<input id="studentLng" type="number" step="any" placeholder="44.0092"></label></div><p class="form-help">دەتوانیت شوێنەکە دواتر لە بەشی نەخشە دیاری بکەیت.</p><div class="modal-actions"><button type="button" class="btn btn-light" data-close="studentDialog">پاشگەزبوونەوە</button><button class="btn btn-primary" type="submit">پاشەکەوتکردن</button></div></form></dialog>
+
+  <dialog id="driverDialog" class="modal"><form id="driverForm" class="modal-form"><div class="modal-heading"><div><p class="eyebrow">تۆمار</p><h2>زیادکردنی شۆفێر</h2></div><button type="button" class="icon-button" data-close="driverDialog">×</button></div><input type="hidden" id="driverId"><label>ناوی شۆفێر *<input id="driverName" required maxlength="120"></label><label>ژمارەی مۆبایل<input id="driverPhone" type="tel" maxlength="30"></label><label>جۆری ئۆتۆمبێل<select id="driverVehicleType"><option>پاس</option><option>تەکسی</option><option>ئۆتۆمبێلی تایبەت</option></select></label><label>تێبینی<textarea id="driverNotes" rows="2" maxlength="250"></textarea></label><div class="modal-actions"><button type="button" class="btn btn-light" data-close="driverDialog">پاشگەزبوونەوە</button><button class="btn btn-primary" type="submit">پاشەکەوتکردن</button></div></form></dialog>
+
+  <dialog id="vehicleDialog" class="modal"><form id="vehicleForm" class="modal-form"><div class="modal-heading"><div><p class="eyebrow">تۆمار</p><h2>زیادکردنی ئۆتۆمبێل</h2></div><button type="button" class="icon-button" data-close="vehicleDialog">×</button></div><input type="hidden" id="vehicleId"><label>ژمارە یان ناسنامە *<input id="vehicleNumber" required maxlength="60" placeholder="پاس-٠١"></label><label>جۆری ئۆتۆمبێل<select id="vehicleType"><option>پاس</option><option>تەکسی</option></select></label><label>توانای دانیشتن<input id="vehicleCapacity" type="number" min="1" max="100" value="14" required></label><label>شۆفێر<select id="vehicleDriver"><option value="">دیاری نەکراوە</option></select></label><div class="modal-actions"><button type="button" class="btn btn-light" data-close="vehicleDialog">پاشگەزبوونەوە</button><button class="btn btn-primary" type="submit">پاشەکەوتکردن</button></div></form></dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>
